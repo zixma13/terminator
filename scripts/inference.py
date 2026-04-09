@@ -157,16 +157,28 @@ def build_tools_prompt():
 def parse_tool_call(text: str):
     """Try to parse a tool call from the model response."""
     text = text.strip()
-    # Try to find JSON in the response
-    for line in text.split('\n'):
-        line = line.strip()
-        if line.startswith('{') and '"tool"' in line:
-            try:
-                obj = json.loads(line)
-                if "tool" in obj and "args" in obj:
-                    return obj
-            except json.JSONDecodeError:
-                continue
+    import re
+    # Find the outermost { ... } that contains "tool"
+    # Walk through finding balanced braces
+    start = None
+    depth = 0
+    for i, c in enumerate(text):
+        if c == '{':
+            if depth == 0:
+                start = i
+            depth += 1
+        elif c == '}':
+            depth -= 1
+            if depth == 0 and start is not None:
+                candidate = text[start:i+1]
+                if '"tool"' in candidate:
+                    try:
+                        obj = json.loads(candidate)
+                        if "tool" in obj and "args" in obj:
+                            return obj
+                    except json.JSONDecodeError:
+                        pass
+                start = None
     return None
 
 
@@ -187,9 +199,14 @@ def handle_text(processor, model, content: str, history: list):
 
     response = generate_response(processor, model, messages)
 
-    # Check if it's a tool call
+    # Check if it's a tool call (even if mixed with other text)
     tool_call = parse_tool_call(response)
     if tool_call:
+        # If there's text before the tool call, show it first
+        clean = response.replace(json.dumps(tool_call), '').strip()
+        if clean:
+            for word in clean.split():
+                emit({"type": "token", "content": word + " "})
         emit({"type": "tool_call", "tool": tool_call["tool"], "args": tool_call["args"]})
         history.append({"role": "assistant", "content": response})
         return
@@ -307,6 +324,14 @@ def handle_audio(processor, model, audio_b64: str, history: list):
     input_len = inputs["input_ids"].shape[-1]
     outputs = model.generate(**inputs, max_new_tokens=256)
     transcript = processor.decode(outputs[0][input_len:], skip_special_tokens=True).strip()
+
+    # Strip any leaked thinking content
+    if "Thinking Process:" in transcript:
+        # Take only the last line (the actual transcription)
+        transcript = transcript.split('\n')[-1].strip()
+    # Strip thinking tags if present
+    import re
+    transcript = re.sub(r'<\|?channel>thought.*?<channel\|?>', '', transcript, flags=re.DOTALL).strip()
 
     emit({"type": "transcript", "content": transcript})
     os.unlink(tmp.name)
