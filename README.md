@@ -3,6 +3,9 @@
 > *A retro 90s sci-fi terminal AI — talk to a real AI through a neon CRT interface.*
 > *Powered by Gemma 4 E2B. 100% offline. Mac native.*
 
+🌍 **README translations:**
+[🇹🇭 ไทย](docs/README.th.md) · [🇯🇵 日本語](docs/README.ja.md) · [🇨🇳 中文](docs/README.zh.md) · [🇫🇷 Français](docs/README.fr.md) · [🇪🇸 Español](docs/README.es.md) · [🇰🇷 한국어](docs/README.ko.md) · [🇩🇪 Deutsch](docs/README.de.md) · [🇵🇹 Português](docs/README.pt.md) · [🇷🇺 Русский](docs/README.ru.md) · [🇮🇹 Italiano](docs/README.it.md) · [🇮🇳 हिन्दी](docs/README.hi.md) · [🇸🇦 العربية](docs/README.ar.md)
+
 ```
 ╔══════════════════════════════════════════════════╗
 ║  TERMINATOR OS v1.0.0                            ║
