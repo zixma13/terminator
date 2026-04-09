@@ -1,0 +1,9 @@
+/target
+/models
+/.venv
+*.wav
+*.mp3
+__pycache__
+*.pyc
+.DS_Store
+Cargo.lock
