@@ -19,51 +19,53 @@ pub enum State {
 ```rust
 pub struct App {
     pub state: State,
-    pub input: String,              // Text input buffer
-    pub messages: Vec<ChatMessage>, // Conversation history
-    pub current_response: String,   // Streaming response accumulator
+    pub input: String,
+    pub messages: Vec<ChatMessage>,
+    pub current_response: String,
     pub voice_mode: bool,
     pub boot_step: usize,
+    pub loading_pct: u8,        // Fake progress 0-100
     pub should_quit: bool,
-    pub status: String,             // Status bar text
+    pub status: String,
     pub recording_start: Option<Instant>,
-    pub audio_level: AudioLevel,    // Arc<Mutex<Vec<f32>>> for waveform
+    pub audio_level: AudioLevel,
     pub pending_tool: Option<PendingTool>,
-    bridge: Bridge,
-    audio: AudioCapture,
+    pub model_id: String,       // Selected model (e.g. "E4B")
+    pub bridge: Bridge,
+    pub audio: AudioCapture,
 }
 ```
 
-### ChatMessage (src/app.rs)
+### ModelInfo (src/bridge.rs)
 ```rust
-pub struct ChatMessage {
-    pub role: String,    // "user" or "ai"
-    pub content: String,
+pub struct ModelInfo {
+    pub id: &'static str,    // "E2B", "E4B", "26B-A4B", "31B"
+    pub name: &'static str,  // "Gemma 4 E2B"
+    pub ram: &'static str,   // "~4 GB"
+    pub size: &'static str,  // "~5 GB"
 }
 ```
 
-### PendingTool (src/app.rs)
+### ChatMessage, PendingTool, Bridge
 ```rust
-pub struct PendingTool {
-    pub tool: String,           // Tool name
-    pub args: serde_json::Value, // Tool arguments
-    pub display: String,         // Human-readable description
-}
-```
-
-### Bridge (src/bridge.rs)
-```rust
-pub struct Bridge {
-    child: Child,                    // Python subprocess
-    stdin: ChildStdin,               // Write requests
-    pub rx: mpsc::Receiver<Response>, // Read responses
-}
+pub struct ChatMessage { pub role: String, pub content: String }
+pub struct PendingTool { pub tool: String, pub args: serde_json::Value, pub display: String }
+pub struct Bridge { child: Child, stdin: ChildStdin, pub rx: mpsc::Receiver<Response> }
 ```
 
 ## Python Data Structures
 
+### Model Variants (download_model.py)
+```python
+MODELS = {
+    "E2B":     ("google/gemma-4-E2B-it",     "gemma-4-E2B-it",     "~5 GB"),
+    "E4B":     ("google/gemma-4-E4B-it",     "gemma-4-E4B-it",     "~9 GB"),
+    "26B-A4B": ("google/gemma-4-26B-A4B-it", "gemma-4-26B-A4B-it", "~16 GB"),
+    "31B":     ("google/gemma-4-31B-it",     "gemma-4-31B-it",     "~20 GB"),
+}
+```
+
 ### Conversation History
-Maintained as a `list[dict]` in `inference.py`:
 ```python
 history = [
     {"role": "user", "content": "..."},
@@ -72,35 +74,24 @@ history = [
 ]
 ```
 
-### Tool Definition Schema
-```python
-{
-    "name": "tool_name",
-    "description": "What the tool does",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "param": {"type": "string", "description": "..."}
-        },
-        "required": ["param"]
-    }
-}
-```
-
-## Data Flow Diagram
+## Data Flow
 
 ```mermaid
 flowchart LR
+    subgraph Startup
+        Picker[Model Picker] --> ModelID[model_id]
+    end
+
     subgraph Input
         KB[Keyboard] --> InputBuf[input: String]
-        Mic[Microphone] --> PCM[PCM f32 buffer]
-        PCM --> B64[Base64 encoded]
+        Mic[Microphone] --> PCM[PCM f32] --> B64[Base64]
     end
 
     subgraph Processing
+        ModelID --> Python
         InputBuf --> Req[JSON Request]
         B64 --> Req
-        Req --> Python[Gemma 4 E2B]
+        Req --> Python[Gemma 4]
         Python --> Resp[JSON Response]
     end
 

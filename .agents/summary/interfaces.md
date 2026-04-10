@@ -2,79 +2,9 @@
 
 ## Bridge JSON Protocol
 
-The primary interface is the JSON-lines protocol between Rust and Python over stdin/stdout.
-
-### Request Schema (Rust → Python)
-
-```mermaid
-classDiagram
-    class Request {
-        <<enum>>
-    }
-    class Text {
-        +type: "text"
-        +content: String
-    }
-    class Audio {
-        +type: "audio"
-        +data: String (base64)
-    }
-    class ToolResult {
-        +type: "tool_result"
-        +tool: String
-        +result: String
-        +approved: bool
-    }
-    class Reset {
-        +type: "reset"
-    }
-    Request <|-- Text
-    Request <|-- Audio
-    Request <|-- ToolResult
-    Request <|-- Reset
-```
-
-### Response Schema (Python → Rust)
-
-```mermaid
-classDiagram
-    class Response {
-        <<enum>>
-    }
-    class Ready {
-        +type: "ready"
-    }
-    class Transcript {
-        +type: "transcript"
-        +content: String
-    }
-    class Token {
-        +type: "token"
-        +content: String
-    }
-    class ToolCallResp {
-        +type: "tool_call"
-        +tool: String
-        +args: Object
-    }
-    class Done {
-        +type: "done"
-    }
-    class ErrorResp {
-        +type: "error"
-        +message: String
-    }
-    Response <|-- Ready
-    Response <|-- Transcript
-    Response <|-- Token
-    Response <|-- ToolCallResp
-    Response <|-- Done
-    Response <|-- ErrorResp
-```
+Same as before — see [architecture.md](architecture.md) for the full Request/Response tables.
 
 ## Tool Calling Interface
-
-### Available Tools
 
 | Tool | Parameters | Returns |
 |------|-----------|---------|
@@ -84,28 +14,40 @@ classDiagram
 | `run_command` | `command: String` | stdout + stderr (truncated at 2000 chars) |
 | `analyze_image` | `path: String`, `question: String` | JSON args passed to Python vision |
 
-### Tool Call Flow
+### Path Handling
+- `~` is expanded to `$HOME` in all file-based tools via `shellexpand()`
+- `run_command` expands `~` even inside quotes (`"~/path"` → `"/Users/.../path"`)
+- On command failure, result includes: `"HINT: If file paths contain spaces, wrap them in quotes."`
+- Tool description tells Gemma: `"CRITICAL: Always use single quotes around file paths that contain spaces"`
+
+### Tool Call Sequence
 
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant R as Rust App
-    participant P as Python/Gemma
+    participant R as Rust
+    participant P as Python
 
-    U->>R: "List files in ~/Downloads"
-    R->>P: {"type":"text","content":"List files in ~/Downloads"}
-    P->>R: {"type":"tool_call","tool":"list_directory","args":{"path":"~/Downloads"}}
+    U->>R: "Delete screenshot file"
+    R->>P: {"type":"text","content":"..."}
+    P->>R: {"type":"tool_call","tool":"run_command","args":{"command":"rm '/path/file with spaces.png'"}}
     R->>U: ⚠ Approval popup
-    U->>R: Press Y
-    R->>R: execute_tool("list_directory", {"path":"~/Downloads"})
-    R->>P: {"type":"tool_result","tool":"list_directory","result":"file1.txt\nfile2.pdf","approved":true}
-    P->>R: {"type":"token","content":"Here are..."} (streaming)
-    P->>R: {"type":"done"}
+    U->>R: Y
+    R->>R: expand ~ + sh -c
+    R->>P: {"type":"tool_result","result":"...","approved":true}
+    P->>R: Streaming response → Done
 ```
 
 ## Audio Interface
 
 - **Format**: PCM 16kHz mono float32
 - **Transport**: Base64-encoded 16-bit LE over JSON
-- **Max duration**: 28 seconds (enforced by Rust)
-- **TTS output**: MMS-TTS generates WAV, played via macOS `afplay`
+- **Max duration**: 28 seconds
+- **TTS output**: MMS-TTS WAV → macOS `afplay`
+
+## Model Selection Interface
+
+- `MODELS` array in `bridge.rs` defines available variants
+- `model_status()` in `main.rs` checks: dir exists → `config.json` exists → `.safetensors` files exist
+- Partial downloads show `[↓ current/total GB]` via `dir_size()` recursive calculation
+- Selected model ID passed to Python via `--model` CLI arg

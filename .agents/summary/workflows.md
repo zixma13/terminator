@@ -1,29 +1,32 @@
 # Workflows
 
-## Application Startup
+## Startup: Model Selection → Boot → Ready
 
 ```mermaid
 sequenceDiagram
-    participant M as main.rs
+    participant U as User
+    participant M as main.rs (Picker)
+    participant App as App
     participant B as Bridge
     participant P as Python
-    participant A as AudioCapture
-    participant UI as ui.rs
 
-    M->>M: enable_raw_mode, alternate screen
-    M->>B: Bridge::spawn()
-    B->>P: spawn python3 scripts/inference.py
-    M->>A: AudioCapture::new()
-    M->>M: App::new(bridge, audio)
-    Note over M: State = Booting
+    M->>M: Render model picker (Ratatui)
+    M->>M: model_status() for each variant
+    U->>M: Arrow keys + Enter (select model)
+    M->>B: Bridge::spawn(model_id)
+    B->>P: python3 inference.py --model E4B
+    M->>App: App::new(bridge, audio, model_id)
+    Note over App: State = Booting
     loop Boot animation
-        M->>UI: draw() — render boot lines
-        M->>M: tick_boot()
+        App->>App: tick_boot()
     end
-    Note over M: State = Loading
+    Note over App: State = Loading
+    loop Fake progress
+        App->>App: check_ready() — tick loading_pct
+    end
     P->>B: {"type":"ready"}
-    M->>M: check_ready()
-    Note over M: State = Idle
+    App->>App: loading_pct = 100
+    Note over App: State = Idle
 ```
 
 ## Text Input Flow
@@ -35,16 +38,32 @@ sequenceDiagram
     participant B as Bridge
     participant P as Python
 
-    U->>App: Type characters
-    App->>App: input.push(c)
-    U->>App: Press Enter
+    U->>App: Type + Enter
     App->>App: submit_text()
     Note over App: State = Processing
-    App->>B: send(Request::Text)
-    B->>P: {"type":"text","content":"..."}
-    P->>B: {"type":"token","content":"..."} (repeated)
+    App->>B: Request::Text{content}
+    P->>B: Token (repeated)
     Note over App: State = Streaming
-    P->>B: {"type":"done"}
+    P->>B: Done
+    Note over App: State = Idle
+```
+
+## Tool Approval Flow
+
+```mermaid
+sequenceDiagram
+    participant P as Python
+    participant App as App
+    participant U as User
+
+    P->>App: {"type":"tool_call","tool":"run_command","args":{...}}
+    Note over App: State = AwaitingApproval
+    App->>U: Red WARNING popup
+    U->>App: Y (approve)
+    App->>App: execute_tool() — expands ~, runs sh -c
+    Note over App: State = Processing
+    App->>P: {"type":"tool_result","result":"...","approved":true}
+    P->>App: Streaming response
     Note over App: State = Idle
 ```
 
@@ -55,58 +74,25 @@ sequenceDiagram
     participant U as User
     participant App as App
     participant Mic as AudioCapture
-    participant B as Bridge
     participant P as Python
 
-    U->>App: Press Space
+    U->>App: Space (start)
     App->>Mic: start()
-    Note over App: State = Recording
-    Note over Mic: Capturing PCM 16kHz mono
-    App->>App: tick_recording() — update timer, check 28s limit
-    U->>App: Press Space
-    App->>Mic: stop() → Vec<f32>
-    App->>App: encode_base64(pcm)
+    Note over App: State = Recording (max 28s)
+    U->>App: Space (stop)
+    App->>Mic: stop() → PCM → base64
     Note over App: State = Processing
-    App->>B: send(Request::Audio{data})
-    P->>B: {"type":"transcript","content":"..."}
-    P->>B: {"type":"token","content":"..."} (repeated)
-    P->>B: {"type":"done"}
+    App->>P: Request::Audio{data}
+    P->>App: Transcript → Tokens → Done
     Note over App: State = Idle
 ```
 
-## Tool Approval Flow
-
-```mermaid
-sequenceDiagram
-    participant P as Python
-    participant App as App
-    participant UI as ui.rs
-    participant U as User
-
-    P->>App: {"type":"tool_call","tool":"run_command","args":{...}}
-    Note over App: State = AwaitingApproval
-    App->>UI: draw_approval_popup()
-    U->>App: Press Y (approve)
-    App->>App: execute_tool()
-    Note over App: State = Processing
-    App->>P: {"type":"tool_result","result":"...","approved":true}
-    P->>App: streaming response about result
-    Note over App: State = Idle
-
-    Note over U: OR
-    U->>App: Press N (reject)
-    Note over App: State = Processing
-    App->>P: {"type":"tool_result","result":"","approved":false}
-    P->>App: acknowledgment response
-    Note over App: State = Idle
-```
-
-## TTS Output Flow (Python-side)
+## TTS Output (Python-side)
 
 ```mermaid
 flowchart LR
-    A[AI response text] --> B[detect_lang]
-    B --> C[get_tts — load/cache MMS-TTS model]
-    C --> D[Generate WAV to tempfile]
-    D --> E[subprocess: afplay wav]
+    A[AI response] --> B[detect_lang]
+    B --> C[get_tts — load/cache MMS-TTS]
+    C --> D[Generate WAV tempfile]
+    D --> E[afplay]
 ```
