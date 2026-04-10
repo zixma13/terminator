@@ -32,6 +32,10 @@
 - 🔒 **100% offline** — no cloud, no API keys, no data leaves your machine
 - 🍎 **Mac native** — optimized for Apple Silicon (M1+)
 
+## Demo
+
+![Demo](docs/screenshots/demo.gif)
+
 ## Architecture
 
 ```
