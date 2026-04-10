@@ -72,7 +72,7 @@ TOOLS = [
         "parameters": {
             "type": "object",
             "properties": {
-                "command": {"type": "string", "description": "The shell command to execute"}
+                "command": {"type": "string", "description": "The shell command to execute. CRITICAL: Always use single quotes around file paths that contain spaces, e.g. rm '/Users/me/my file.txt'. Never leave spaces unquoted in paths."}
             },
             "required": ["command"]
         }

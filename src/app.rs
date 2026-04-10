@@ -307,13 +307,20 @@ fn execute_tool(tool: &str, args: &serde_json::Value) -> String {
         }
         "run_command" => {
             let cmd = args["command"].as_str().unwrap_or("");
-            match Command::new("sh").arg("-c").arg(cmd).output() {
+            // Expand ~ (even inside quotes) and ensure proper shell execution
+            let cmd = cmd.replace("\"~/", &format!("\"{}/", std::env::var("HOME").unwrap_or_default()));
+            let cmd = cmd.replace("'~/", &format!("'{}/", std::env::var("HOME").unwrap_or_default()));
+            let cmd = cmd.replace("~/", &format!("{}/", std::env::var("HOME").unwrap_or_default()));
+            match Command::new("sh").arg("-c").arg(&cmd).output() {
                 Ok(output) => {
                     let stdout = String::from_utf8_lossy(&output.stdout);
                     let stderr = String::from_utf8_lossy(&output.stderr);
                     let mut result = stdout.to_string();
                     if !stderr.is_empty() {
                         result.push_str(&format!("\nSTDERR: {stderr}"));
+                    }
+                    if !output.status.success() && result.trim().is_empty() {
+                        result = format!("Command failed (exit {}). HINT: If file paths contain spaces, wrap them in quotes.", output.status.code().unwrap_or(-1));
                     }
                     if result.len() > 2000 {
                         result.truncate(2000);
