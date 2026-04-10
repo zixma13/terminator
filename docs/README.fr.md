@@ -29,7 +29,7 @@
 - 👁️ **Vision** — analyse d'images sur votre système de fichiers via l'encodeur vision de Gemma
 - 🔧 **Outils agentiques** — ouvrir des fichiers, lire des fichiers, lister des répertoires, exécuter des commandes
 - ⚠️ **Approbation de sécurité** — chaque action d'outil nécessite l'approbation explicite de l'utilisateur via popup
-- 🖥️ **Interface CRT rétro** — terminal néon vert avec séquence de démarrage, propulsé par Ratatui
+- 🖥️ **Interface terminale rétro** — terminal néon vert avec séquence de démarrage, propulsé par Ratatui
 - 🔒 **100% hors ligne** — pas de cloud, pas de clés API, aucune donnée ne quitte votre machine
 - 🍎 **Natif Mac** — optimisé pour Apple Silicon (M1+)
 

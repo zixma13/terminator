@@ -28,7 +28,7 @@
 - 👁️ **Visione** — analizza immagini nel tuo filesystem tramite l'encoder visivo di Gemma
 - 🔧 **Strumenti agentici** — aprire file, leggere file, elencare directory, eseguire comandi
 - ⚠️ **Approvazione di sicurezza** — ogni azione richiede l'approvazione esplicita dell'utente tramite popup
-- 🖥️ **Interfaccia CRT retro** — terminale verde neon con sequenza di avvio, alimentato da Ratatui
+- 🖥️ **Interfaccia terminale retro** — terminale verde neon con sequenza di avvio, alimentato da Ratatui
 - 🔒 **100% offline** — nessun cloud, nessuna chiave API, nessun dato lascia la tua macchina
 - 🍎 **Nativo per Mac** — ottimizzato per Apple Silicon (M1+)
 

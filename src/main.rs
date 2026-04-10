@@ -6,6 +6,7 @@ mod ui;
 
 use anyhow::Result;
 use app::{App, State};
+use bridge::MODELS;
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
@@ -16,15 +17,91 @@ use ratatui::Terminal;
 use std::io::stdout;
 use std::time::Duration;
 
+/// Check which models are downloaded locally.
+fn is_downloaded(model_id: &str) -> bool {
+    let cwd = std::env::current_dir().unwrap_or_default();
+    let variants = [
+        ("E2B", "gemma-4-E2B-it"),
+        ("E4B", "gemma-4-E4B-it"),
+        ("26B-A4B", "gemma-4-26B-A4B-it"),
+        ("31B", "gemma-4-31B-it"),
+    ];
+    for (id, dir) in variants {
+        if id == model_id {
+            return cwd.join("models").join(dir).is_dir();
+        }
+    }
+    false
+}
+
+/// Show model selection menu before TUI starts.
+fn select_model() -> Result<String> {
+    // Use green ANSI for the retro feel
+    let green = "\x1b[32m";
+    let dim = "\x1b[2m";
+    let bold = "\x1b[1m";
+    let reset = "\x1b[0m";
+    let amber = "\x1b[33m";
+
+    println!("{green}╔══════════════════════════════════════════════════╗");
+    println!("║  {bold}TERMINATOR — MODEL SELECT{reset}{green}                       ║");
+    println!("╠══════════════════════════════════════════════════╣{reset}");
+
+    for (i, m) in MODELS.iter().enumerate() {
+        let downloaded = if is_downloaded(m.id) {
+            format!("{green}[✓ READY]{reset}")
+        } else {
+            format!("{dim}[download]{reset}")
+        };
+        println!(
+            "{green}║{reset}  {bold}{}{reset}. {:<20} RAM: {:<8} Disk: {:<8} {}  {green}║{reset}",
+            i + 1, m.name, m.ram, m.size, downloaded
+        );
+    }
+
+    println!("{green}╠══════════════════════════════════════════════════╣");
+    println!("║{reset}  {amber}Select model [1-4] or Enter for default (1):{reset}    {green}║");
+    println!("╚══════════════════════════════════════════════════╝{reset}");
+
+    print!("{green}> {reset}");
+    std::io::Write::flush(&mut std::io::stdout())?;
+
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input)?;
+    let choice = input.trim();
+
+    let idx = if choice.is_empty() {
+        0
+    } else {
+        match choice.parse::<usize>() {
+            Ok(n) if n >= 1 && n <= MODELS.len() => n - 1,
+            _ => {
+                println!("{amber}Invalid choice, using default (E2B){reset}");
+                0
+            }
+        }
+    };
+
+    let selected = MODELS[idx].id.to_string();
+    println!(
+        "\n{green}▶ Loading {bold}{}{reset}{green} ...{reset}\n",
+        MODELS[idx].name
+    );
+
+    Ok(selected)
+}
+
 fn main() -> Result<()> {
+    let model_id = select_model()?;
+
     enable_raw_mode()?;
     stdout().execute(EnterAlternateScreen)?;
     let backend = CrosstermBackend::new(stdout());
     let mut terminal = Terminal::new(backend)?;
 
-    let bridge = bridge::Bridge::spawn()?;
+    let bridge = bridge::Bridge::spawn(&model_id)?;
     let (audio, audio_level) = audio::AudioCapture::new()?;
-    let mut app = App::new(bridge, audio, audio_level);
+    let mut app = App::new(bridge, audio, audio_level, model_id);
 
     let result = run(&mut terminal, &mut app);
 

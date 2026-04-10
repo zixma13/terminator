@@ -3,7 +3,7 @@
 🌍 **README translations:**
 [🇬🇧 English](../README.md) · [🇹🇭 ไทย](README.th.md) · [🇯🇵 日本語](README.ja.md) · [🇨🇳 中文](README.zh.md) · [🇫🇷 Français](README.fr.md) · [🇪🇸 Español](README.es.md) · [🇰🇷 한국어](README.ko.md) · [🇩🇪 Deutsch](README.de.md) · [🇵🇹 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇮🇹 Italiano](README.it.md) · [🇮🇳 हिन्दी](README.hi.md) · [🇸🇦 العربية](README.ar.md)
 
-> *レトロ90年代SFターミナルAI — ネオンCRTインターフェースで本物のAIと会話*
+> *レトロ90年代SFターミナルAI — レトロターミナルインターフェースで本物のAIと会話*
 > *Gemma 4 E2B搭載。100%オフライン。Macネイティブ。*
 
 ```
@@ -28,7 +28,7 @@
 - 👁️ **ビジョン** — Gemmaビジョンエンコーダーでファイルシステム上の画像を分析
 - 🔧 **エージェントツール** — ファイルを開く、読む、ディレクトリ一覧、コマンド実行
 - ⚠️ **セキュリティ承認** — すべてのツール操作にポップアップでユーザー承認が必要
-- 🖥️ **レトロCRT UI** — ブートシーケンス付きネオングリーンターミナル、Ratatui搭載
+- 🖥️ **レトロterminal UI** — ブートシーケンス付きネオングリーンターミナル、Ratatui搭載
 - 🔒 **100%オフライン** — クラウドなし、APIキー不要、データは外部に送信されません
 - 🍎 **Macネイティブ** — Apple Silicon（M1+）に最適化
 
@@ -36,7 +36,7 @@
 
 ```
 terminator (Rustバイナリ)
-├── ratatui       → レトロCRTターミナルUI
+├── ratatui       → レトロターミナルUI
 ├── cpal          → マイク入力キャプチャ（PCM 16kHz mono）
 └── Pythonブリッジ (subprocess, JSONプロトコル)
     ├── HuggingFace Transformers

@@ -3,7 +3,7 @@
 🌍 **README translations:**
 [🇬🇧 English](../README.md) · [🇹🇭 ไทย](README.th.md) · [🇯🇵 日本語](README.ja.md) · [🇨🇳 中文](README.zh.md) · [🇫🇷 Français](README.fr.md) · [🇪🇸 Español](README.es.md) · [🇰🇷 한국어](README.ko.md) · [🇩🇪 Deutsch](README.de.md) · [🇵🇹 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇮🇹 Italiano](README.it.md) · [🇮🇳 हिन्दी](README.hi.md) · [🇸🇦 العربية](README.ar.md)
 
-> *Eine Retro-90er-Sci-Fi-Terminal-KI — sprich mit einer echten KI über eine Neon-CRT-Oberfläche.*
+> *Eine Retro-90er-Sci-Fi-Terminal-KI — sprich mit einer echten KI über eine Retro-Terminal-Oberfläche.*
 > *Angetrieben von Gemma 4 E2B. 100% offline. Mac-nativ.*
 
 ```
@@ -29,7 +29,7 @@
 - 👁️ **Vision** — Bilder im Dateisystem über Gemmas Vision-Encoder analysieren
 - 🔧 **Agentische Werkzeuge** — Dateien öffnen, lesen, Verzeichnisse auflisten, Befehle ausführen
 - ⚠️ **Sicherheitsgenehmigung** — jede Werkzeugaktion erfordert explizite Benutzergenehmigung per Popup
-- 🖥️ **Retro-CRT-UI** — neongrünes Terminal mit Boot-Sequenz, angetrieben von Ratatui
+- 🖥️ **Retro-Terminal-UI** — neongrünes Terminal mit Boot-Sequenz, angetrieben von Ratatui
 - 🔒 **100% offline** — keine Cloud, keine API-Schlüssel, keine Daten verlassen deinen Rechner
 - 🍎 **Mac-nativ** — optimiert für Apple Silicon (M1+)
 
@@ -37,7 +37,7 @@
 
 ```
 terminator (Rust-Binary)
-├── ratatui       → Retro-CRT-Terminal-UI
+├── ratatui       → Retro-Terminal-UI
 ├── cpal          → Mikrofonaufnahme (PCM 16kHz Mono)
 └── Python-Brücke (Subprocess, JSON-Protokoll)
     ├── HuggingFace Transformers

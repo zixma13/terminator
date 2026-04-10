@@ -1,6 +1,6 @@
 # TERMINATOR 🤖
 
-> *A retro 90s sci-fi terminal AI — talk to a real AI through a neon CRT interface.*
+> *A retro 90s sci-fi terminal AI — talk to a real AI through a retro terminal interface.*
 > *Powered by Gemma 4 E2B. 100% offline. Mac native.*
 
 🌍 **README translations:**
@@ -28,7 +28,7 @@
 - 👁️ **Vision** — analyze images on your filesystem via Gemma's vision encoder
 - 🔧 **Agentic tools** — open files, read files, list directories, run commands
 - ⚠️ **Security approval** — every tool action requires explicit user approval via popup
-- 🖥️ **Retro CRT UI** — neon green terminal with boot sequence, powered by Ratatui
+- 🖥️ **Retro terminal UI** — neon green terminal with boot sequence, powered by Ratatui
 - 🔒 **100% offline** — no cloud, no API keys, no data leaves your machine
 - 🍎 **Mac native** — optimized for Apple Silicon (M1+)
 
@@ -64,8 +64,19 @@ terminator (Rust binary)
 - macOS on Apple Silicon (M1+)
 - Rust 1.75+
 - Python 3.11+
-- ~5GB disk (model weights)
-- ~4GB RAM (inference)
+- Disk & RAM depend on model (see below)
+
+## Models
+
+| Model | Role | Disk | RAM | Context | Best For |
+|-------|------|------|-----|---------|----------|
+| [Gemma 4 E2B](https://huggingface.co/google/gemma-4-E2B-it) | Brain (text + audio + vision) | ~5 GB | ~4 GB | 128K | Edge / phones |
+| [Gemma 4 E4B](https://huggingface.co/google/gemma-4-E4B-it) | Brain (text + audio + vision) | ~9 GB | ~8 GB | 128K | Laptops |
+| [Gemma 4 26B-A4B](https://huggingface.co/google/gemma-4-26B-A4B-it) | Brain (text + audio + vision, MoE) | ~16 GB | ~18 GB | 256K | Best balance |
+| [Gemma 4 31B](https://huggingface.co/google/gemma-4-31B-it) | Brain (text + audio + vision, Dense) | ~20 GB | ~20 GB | 256K | Max quality |
+| [MMS-TTS](https://huggingface.co/facebook/mms-tts-eng) | Voice output | ~145 MB/lang | — | — | 1100+ languages |
+
+At startup, a model picker lets you choose which variant to run. Downloaded models show `[✓ READY]`.
 
 ## Quick Start
 

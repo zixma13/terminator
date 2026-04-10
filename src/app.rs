@@ -35,11 +35,13 @@ pub struct App {
     pub current_response: String,
     pub voice_mode: bool,
     pub boot_step: usize,
+    pub loading_pct: u8,
     pub should_quit: bool,
     pub status: String,
     pub recording_start: Option<Instant>,
     pub audio_level: AudioLevel,
     pub pending_tool: Option<PendingTool>,
+    pub model_id: String,
     pub bridge: Bridge,
     pub audio: AudioCapture,
 }
@@ -47,7 +49,7 @@ pub struct App {
 const MAX_RECORD_SECS: u64 = 28;
 
 impl App {
-    pub fn new(bridge: Bridge, audio: AudioCapture, audio_level: AudioLevel) -> Self {
+    pub fn new(bridge: Bridge, audio: AudioCapture, audio_level: AudioLevel, model_id: String) -> Self {
         Self {
             state: State::Booting,
             input: String::new(),
@@ -55,14 +57,21 @@ impl App {
             current_response: String::new(),
             voice_mode: false,
             boot_step: 0,
+            loading_pct: 0,
             should_quit: false,
             status: "BOOTING...".into(),
             recording_start: None,
             audio_level,
             pending_tool: None,
+            model_id,
             bridge,
             audio,
         }
+    }
+
+    /// Model display name for UI (e.g. "GEMMA-4-E4B")
+    pub fn model_display(&self) -> String {
+        format!("GEMMA-4-{}", self.model_id.to_uppercase())
     }
 
     pub fn tick_boot(&mut self) {
@@ -75,8 +84,17 @@ impl App {
 
     pub fn check_ready(&mut self) {
         if let Ok(Response::Ready) = self.bridge.rx.try_recv() {
+            self.loading_pct = 100;
             self.state = State::Idle;
             self.status = "ONLINE — Type or press [SPACE] to speak".into();
+        } else {
+            // Fake progress: fast to 60%, slow to 92%, stall there
+            if self.loading_pct < 60 {
+                self.loading_pct = self.loading_pct.saturating_add(3);
+            } else if self.loading_pct < 92 {
+                self.loading_pct = self.loading_pct.saturating_add(1);
+            }
+            self.status = format!("LOADING NEURAL CORE... {}%", self.loading_pct);
         }
     }
 

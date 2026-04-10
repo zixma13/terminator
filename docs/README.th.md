@@ -3,7 +3,7 @@
 🌍 **README translations:**
 [🇬🇧 English](../README.md) · [🇹🇭 ไทย](README.th.md) · [🇯🇵 日本語](README.ja.md) · [🇨🇳 中文](README.zh.md) · [🇫🇷 Français](README.fr.md) · [🇪🇸 Español](README.es.md) · [🇰🇷 한국어](README.ko.md) · [🇩🇪 Deutsch](README.de.md) · [🇵🇹 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇮🇹 Italiano](README.it.md) · [🇮🇳 हिन्दी](README.hi.md) · [🇸🇦 العربية](README.ar.md)
 
-> *AI เทอร์มินัลสไตล์ไซไฟยุค 90 — คุยกับ AI จริงผ่านหน้าจอ CRT นีออน*
+> *AI เทอร์มินัลสไตล์ไซไฟยุค 90 — คุยกับ AI จริงผ่านเทอร์มินัลย้อนยุค*
 > *ขับเคลื่อนโดย Gemma 4 E2B ออฟไลน์ 100% รองรับ Mac โดยเฉพาะ*
 
 ```
@@ -28,7 +28,7 @@
 - 👁️ **วิชัน** — วิเคราะห์ภาพในระบบไฟล์ผ่าน Gemma vision encoder
 - 🔧 **เครื่องมือเอเจนต์** — เปิดไฟล์, อ่านไฟล์, แสดงรายการไดเรกทอรี, รันคำสั่ง
 - ⚠️ **การอนุมัติความปลอดภัย** — ทุกการกระทำต้องได้รับการอนุมัติจากผู้ใช้ผ่านป๊อปอัป
-- 🖥️ **UI แบบ CRT ย้อนยุค** — เทอร์มินัลนีออนเขียวพร้อมลำดับบูต ขับเคลื่อนโดย Ratatui
+- 🖥️ **UI เทอร์มินัลย้อนยุค** — เทอร์มินัลนีออนเขียวพร้อมลำดับบูต ขับเคลื่อนโดย Ratatui
 - 🔒 **ออฟไลน์ 100%** — ไม่มีคลาวด์ ไม่ต้องใช้ API key ข้อมูลไม่ออกจากเครื่อง
 - 🍎 **Mac native** — ปรับแต่งสำหรับ Apple Silicon (M1+)
 
@@ -36,7 +36,7 @@
 
 ```
 terminator (Rust binary)
-├── ratatui       → UI เทอร์มินัล CRT ย้อนยุค
+├── ratatui       → UI เทอร์มินัลย้อนยุค
 ├── cpal          → จับเสียงไมโครโฟน (PCM 16kHz mono)
 └── Python bridge (subprocess, JSON protocol)
     ├── HuggingFace Transformers

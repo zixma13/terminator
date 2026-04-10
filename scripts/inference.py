@@ -12,8 +12,25 @@ import torch
 from transformers import AutoProcessor, AutoModelForMultimodalLM, VitsModel, AutoTokenizer
 import soundfile as sf
 
-MODEL_DIR = os.path.join(os.path.dirname(__file__), "..", "models", "gemma-4-E2B-it")
-MODEL_ID = MODEL_DIR if os.path.isdir(MODEL_DIR) else "google/gemma-4-E2B-it"
+MODELS_BASE = os.path.join(os.path.dirname(__file__), "..", "models")
+
+def resolve_model():
+    """Resolve model from --model arg or default to E2B."""
+    name = "E2B"
+    for i, arg in enumerate(sys.argv):
+        if arg == "--model" and i + 1 < len(sys.argv):
+            name = sys.argv[i + 1]
+    variants = {
+        "E2B":     ("gemma-4-E2B-it",     "google/gemma-4-E2B-it"),
+        "E4B":     ("gemma-4-E4B-it",     "google/gemma-4-E4B-it"),
+        "26B-A4B": ("gemma-4-26B-A4B-it", "google/gemma-4-26B-A4B-it"),
+        "31B":     ("gemma-4-31B-it",     "google/gemma-4-31B-it"),
+    }
+    dirname, hf_id = variants.get(name.upper(), variants["E2B"])
+    local = os.path.join(MODELS_BASE, dirname)
+    return local if os.path.isdir(local) else hf_id
+
+MODEL_ID = resolve_model()
 
 TOOLS = [
     {

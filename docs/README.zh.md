@@ -3,7 +3,7 @@
 🌍 **README translations:**
 [🇬🇧 English](../README.md) · [🇹🇭 ไทย](README.th.md) · [🇯🇵 日本語](README.ja.md) · [🇨🇳 中文](README.zh.md) · [🇫🇷 Français](README.fr.md) · [🇪🇸 Español](README.es.md) · [🇰🇷 한국어](README.ko.md) · [🇩🇪 Deutsch](README.de.md) · [🇵🇹 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇮🇹 Italiano](README.it.md) · [🇮🇳 हिन्दी](README.hi.md) · [🇸🇦 العربية](README.ar.md)
 
-> *复古90年代科幻终端AI — 通过霓虹CRT界面与真正的AI对话*
+> *复古90年代科幻终端AI — 通过霓虹终端界面与真正的AI对话*
 > *由Gemma 4 E2B驱动。100%离线。Mac原生。*
 
 ```
@@ -28,7 +28,7 @@
 - 👁️ **视觉** — 通过Gemma视觉编码器分析文件系统中的图像
 - 🔧 **代理工具** — 打开文件、读取文件、列出目录、运行命令
 - ⚠️ **安全审批** — 每个工具操作都需要通过弹窗获得用户明确批准
-- 🖥️ **复古CRT界面** — 霓虹绿终端带启动序列，由Ratatui驱动
+- 🖥️ **复古终端界面** — 霓虹绿终端带启动序列，由Ratatui驱动
 - 🔒 **100%离线** — 无云端、无API密钥、数据不离开你的设备
 - 🍎 **Mac原生** — 针对Apple Silicon（M1+）优化
 
@@ -36,7 +36,7 @@
 
 ```
 terminator (Rust二进制文件)
-├── ratatui       → 复古CRT终端UI
+├── ratatui       → 复古终端UI
 ├── cpal          → 麦克风采集（PCM 16kHz mono）
 └── Python桥接 (subprocess, JSON协议)
     ├── HuggingFace Transformers

@@ -15,11 +15,11 @@ pub const BOOT_LINES: &[&str] = &[
     "",
     "Initializing subsystems...",
     "  MEMORY BANKS .............. OK",
-    "  NEURAL CORE: GEMMA-4-E2B.. LOADING",
+    "  NEURAL CORE: {}.. LOADING",
 ];
 
 pub const BOOT_READY: &[&str] = &[
-    "  NEURAL CORE: GEMMA-4-E2B.. ONLINE",
+    "  NEURAL CORE: {}.. ONLINE",
     "  AUDIO SENSOR .............. ACTIVE",
     "  LANGUAGES: 140+ .......... READY",
     "",

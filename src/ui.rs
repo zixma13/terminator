@@ -17,7 +17,7 @@ pub fn draw(f: &mut Frame, app: &App) {
         ])
         .split(f.area());
 
-    draw_header(f, chunks[0]);
+    draw_header(f, chunks[0], app);
     draw_chat(f, chunks[1], app);
     draw_input(f, chunks[2], app);
     draw_status(f, chunks[3], app);
@@ -30,13 +30,13 @@ pub fn draw(f: &mut Frame, app: &App) {
     }
 }
 
-fn draw_header(f: &mut Frame, area: Rect) {
+fn draw_header(f: &mut Frame, area: Rect, app: &App) {
     let header = Paragraph::new(Line::from(vec![
         Span::styled(" TERMINATOR ", Style::default().fg(PRIMARY).add_modifier(Modifier::BOLD)),
         Span::styled("OS v1.0.0 ", Style::default().fg(DIM)),
         Span::styled("│ ", Style::default().fg(BORDER)),
         Span::styled("NEURAL CORE: ", Style::default().fg(DIM)),
-        Span::styled("GEMMA-4-E2B", Style::default().fg(ACCENT)),
+        Span::styled(app.model_display(), Style::default().fg(ACCENT)),
     ]))
     .block(
         Block::default()
@@ -54,13 +54,27 @@ fn draw_chat(f: &mut Frame, area: Rect, app: &App) {
     if app.state == State::Booting || app.state == State::Loading {
         for (i, line) in BOOT_LINES.iter().enumerate() {
             if i < app.boot_step {
-                lines.push(Line::from(Span::styled(*line, Style::default().fg(PRIMARY))));
+                let text = line.replace("{}", &app.model_display());
+                lines.push(Line::from(Span::styled(text, Style::default().fg(PRIMARY))));
             }
         }
         if app.state == State::Loading {
             for line in BOOT_READY {
-                lines.push(Line::from(Span::styled(*line, Style::default().fg(PRIMARY))));
+                let text = line.replace("{}", &app.model_display());
+                lines.push(Line::from(Span::styled(text, Style::default().fg(PRIMARY))));
             }
+            // Retro progress bar
+            let pct = app.loading_pct as usize;
+            let filled = pct * 30 / 100;
+            let empty = 30 - filled;
+            let bar = format!(
+                "  [{}{}] {}%",
+                "█".repeat(filled),
+                "░".repeat(empty),
+                pct
+            );
+            lines.push(Line::from(Span::raw("")));
+            lines.push(Line::from(Span::styled(bar, Style::default().fg(ACCENT))));
             lines.push(Line::from(Span::styled(
                 "Loading model... please wait.",
                 Style::default().fg(ACCENT).add_modifier(Modifier::SLOW_BLINK),

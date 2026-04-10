@@ -5,6 +5,21 @@ use std::process::{Child, Command, Stdio};
 use std::sync::mpsc;
 use std::thread;
 
+/// Available Gemma 4 model variants.
+pub struct ModelInfo {
+    pub id: &'static str,
+    pub name: &'static str,
+    pub ram: &'static str,
+    pub size: &'static str,
+}
+
+pub const MODELS: &[ModelInfo] = &[
+    ModelInfo { id: "E2B",     name: "Gemma 4 E2B",     ram: "~4 GB", size: "~5 GB" },
+    ModelInfo { id: "E4B",     name: "Gemma 4 E4B",     ram: "~8 GB", size: "~9 GB" },
+    ModelInfo { id: "26B-A4B", name: "Gemma 4 26B-A4B",  ram: "~18 GB", size: "~16 GB" },
+    ModelInfo { id: "31B",     name: "Gemma 4 31B",     ram: "~20 GB", size: "~20 GB" },
+];
+
 /// Messages sent to the Python inference process.
 #[derive(Serialize)]
 #[serde(tag = "type")]
@@ -53,7 +68,7 @@ pub struct Bridge {
 
 impl Bridge {
     /// Spawn the Python inference process and start reading its output.
-    pub fn spawn() -> Result<Self> {
+    pub fn spawn(model_id: &str) -> Result<Self> {
         // Resolve paths relative to the working directory
         let cwd = std::env::current_dir().unwrap_or_default();
         let script = cwd.join("scripts/inference.py");
@@ -66,6 +81,8 @@ impl Bridge {
 
         let mut child = Command::new(&python)
             .arg(&script)
+            .arg("--model")
+            .arg(model_id)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::null())

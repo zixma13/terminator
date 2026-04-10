@@ -3,7 +3,7 @@
 🌍 **README translations:**
 [🇬🇧 English](../README.md) · [🇹🇭 ไทย](README.th.md) · [🇯🇵 日本語](README.ja.md) · [🇨🇳 中文](README.zh.md) · [🇫🇷 Français](README.fr.md) · [🇪🇸 Español](README.es.md) · [🇰🇷 한국어](README.ko.md) · [🇩🇪 Deutsch](README.de.md) · [🇵🇹 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇮🇹 Italiano](README.it.md) · [🇮🇳 हिन्दी](README.hi.md) · [🇸🇦 العربية](README.ar.md)
 
-> *레트로 90년대 SF 터미널 AI — 네온 CRT 인터페이스로 진짜 AI와 대화*
+> *레트로 90년대 SF 터미널 AI — 네온 터미널 인터페이스로 진짜 AI와 대화*
 > *Gemma 4 E2B 기반. 100% 오프라인. Mac 네이티브.*
 
 ```
@@ -28,7 +28,7 @@
 - 👁️ **비전** — Gemma 비전 인코더로 파일 시스템의 이미지 분석
 - 🔧 **에이전트 도구** — 파일 열기, 읽기, 디렉토리 목록, 명령 실행
 - ⚠️ **보안 승인** — 모든 도구 작업은 팝업을 통한 사용자 명시적 승인 필요
-- 🖥️ **레트로 CRT UI** — 부팅 시퀀스가 있는 네온 그린 터미널, Ratatui 기반
+- 🖥️ **레트로 terminal UI** — 부팅 시퀀스가 있는 네온 그린 터미널, Ratatui 기반
 - 🔒 **100% 오프라인** — 클라우드 없음, API 키 불필요, 데이터가 기기를 떠나지 않음
 - 🍎 **Mac 네이티브** — Apple Silicon (M1+) 최적화
 
@@ -36,7 +36,7 @@
 
 ```
 terminator (Rust 바이너리)
-├── ratatui       → 레트로 CRT 터미널 UI
+├── ratatui       → 레트로 터미널 UI
 ├── cpal          → 마이크 캡처 (PCM 16kHz mono)
 └── Python 브리지 (subprocess, JSON 프로토콜)
     ├── HuggingFace Transformers
